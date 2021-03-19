@@ -7,19 +7,18 @@ import androidx.appcompat.widget.AppCompatButton
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(),View.OnClickListener {
-    private var numberA: String = "0"
-    private var numberB: String = "0"
-    private var operator: String = ""
-    private var result: String = ""
-    private val numbers = hashSetOf<String>("0","1","2","3","4","5","6","7","8","9")
-    private val operators = hashSetOf<String>("+","-","x",":")
+    private var numberA = NUMBER_0
+    private var numberB = NUMBER_0
+    private var operator = OPERATOR
+    private val numbers = hashSetOf<String>(NUMBER_0, NUMBER_1, NUMBER_2, NUMBER_3, NUMBER_4, NUMBER_5, NUMBER_6, NUMBER_7, NUMBER_8, NUMBER_9)
+    private val operators = hashSetOf<String>(OPERATOR_ADD, OPERATOR_SUB, OPERATOR_MUL, OPERATOR_DIV)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        listOf<View>(number_0,number_1,number_2,number_3,number_4,number_5,number_6,number_7,number_8,number_9,
-        equal,add,sub,mul,div,ac).forEach { View -> View?.setOnClickListener(this) }
+        listOf<View>(buttonNumber0,buttonNumber1,buttonNumber2,buttonNumber3,buttonNumber4,buttonNumber5,buttonNumber6,buttonNumber7,buttonNumber8,buttonNumber9,
+        buttonEqual,buttonAdd,buttonSub,buttonMul,buttonDiv,buttonAc).forEach { View -> View?.setOnClickListener(this) }
     }
 
     override fun onClick(v: View?) {
@@ -27,46 +26,43 @@ class MainActivity : AppCompatActivity(),View.OnClickListener {
         val value = click.text.toString()
         var content: String = textContent.text.toString()
         when{
-            checkNumber(value) -> {
+            isNumber(value) -> {
                 if (numberA.equals("0")) {
                     numberA = value
                     content = ""
                 }
                 textContent.text = content + value
             }
-            checkOperator(value) -> {
+            isOperator(value) -> {
                 if ( operators.contains(content.get(content.length - 1).toString())) content = content.substring(0,content.length-1)
                 numberA = if (content.isNullOrEmpty()) "0" else content
                 operator = value
                 textContent.text = content + operator
             }
-            value == "=" -> {
+            value == OPERATOR_EQUAL -> {
                 if (operator.equals("") ) textContent.text = content + "\n=" + content
                 else {
                     numberB = if (numberA.length + 1 == content.length) "0" else content.substring(numberA.length + 1)
-                    textContent.text = content + "\n=" + takeEqual(numberA.toDouble(),numberB.toDouble())
+                    textContent.text = content + "\n=" + calculate(numberA.toDouble(),numberB.toDouble())
                 }
-                numberA = "0"
-                numberB = "0"
-                operator = ""
+                numberA = NUMBER_0
+                numberB = NUMBER_0
+                operator = OPERATOR
             }
-            value == "ac" -> {
+            value == OPERATOR_AC -> {
                 content = "0"
                 textContent.text = content
-                numberA = "0"
-                numberB = "0"
+                numberA = NUMBER_0
+                numberB = NUMBER_0
                 operator = ""
             }
         }
     }
-    private fun checkNumber(value: String): Boolean = numbers.contains(value)
-    private fun checkOperator(value: String): Boolean = operators.contains(value)
-    private fun takeEqual(value1: Double,value2: Double) = when(operator)
+    private fun isNumber(value: String): Boolean = numbers.contains(value)
+    private fun isOperator(value: String): Boolean = operators.contains(value)
+    private fun calculate(value1: Double, value2: Double) = when(operator)
     {
-        ":" -> {
-            if (value2 == 0.00) "lỗi"
-            else value1 / value2
-        }
+        ":" -> if (value2 == 0.00) "lỗi" else value1 / value2
         "-" -> value1 - value2
         "x" -> value1 * value2
         else -> value1 + value2
