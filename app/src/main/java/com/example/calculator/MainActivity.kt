@@ -2,10 +2,7 @@ package com.example.calculator
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -13,6 +10,7 @@ class MainActivity : AppCompatActivity(),View.OnClickListener {
     private var numberA: String = "0"
     private var numberB: String = "0"
     private var operator: String = ""
+    private var result: String = ""
     private val numbers = hashSetOf<String>("0","1","2","3","4","5","6","7","8","9")
     private val operators = hashSetOf<String>("+","-","x",":")
 
@@ -27,32 +25,34 @@ class MainActivity : AppCompatActivity(),View.OnClickListener {
     override fun onClick(v: View?) {
         val click = if(v is AppCompatButton) v else return
         val value = click.text.toString()
-        var content: String = contentText.text.toString()
+        var content: String = textContent.text.toString()
         when{
             checkNumber(value) -> {
                 if (numberA.equals("0")) {
                     numberA = value
                     content = ""
                 }
-                contentText.text = content + value
+                textContent.text = content + value
             }
             checkOperator(value) -> {
                 if ( operators.contains(content.get(content.length - 1).toString())) content = content.substring(0,content.length-1)
                 numberA = if (content.isNullOrEmpty()) "0" else content
                 operator = value
-                contentText.text = content + operator
+                textContent.text = content + operator
             }
             value == "=" -> {
-                numberB = if (content.substring(if (numberA.length >= content.length) 1 else numberA.length+1).isNullOrEmpty()) "0"
-                        else content.substring(if (numberA.length >= content.length) 1 else numberA.length+1)
-                contentText.text = content + "\n=" + takeEqual(numberA.toDouble(),numberB.toDouble())
+                if (operator.equals("") ) textContent.text = content + "\n=" + content
+                else {
+                    numberB = if (numberA.length + 1 == content.length) "0" else content.substring(numberA.length + 1)
+                    textContent.text = content + "\n=" + takeEqual(numberA.toDouble(),numberB.toDouble())
+                }
                 numberA = "0"
                 numberB = "0"
                 operator = ""
             }
             value == "ac" -> {
                 content = "0"
-                contentText.text = content
+                textContent.text = content
                 numberA = "0"
                 numberB = "0"
                 operator = ""
@@ -71,6 +71,4 @@ class MainActivity : AppCompatActivity(),View.OnClickListener {
         "x" -> value1 * value2
         else -> value1 + value2
     }
-
-
 }
